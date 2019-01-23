@@ -4,24 +4,26 @@ import operator
 #计算香农熵
 def calcShannonEnt(dataSet):
     numEntries=len(dataSet)
-    labelCounts={}
+    labelCounts={}#定义字典，用来存储不同属性值的个数 ，key-属性，value-属性的个数
     for featVec in dataSet:
         currentLabel=featVec[-1]
         if currentLabel not in labelCounts.keys():
             labelCounts[currentLabel]=0
         labelCounts[currentLabel]+=1
+    #计算数据集的熵
     shannonEnt=0.0
     for key in labelCounts:
         prob=float(labelCounts[key])/numEntries
         shannonEnt-=prob*log(prob,2)
 
     return  shannonEnt
-
+#创建测试数据集
 def createDataSet():
     dataSet=[[1,1,'yes'],[1,1,'yes'],[1,0,'no'],[0,1,'no'],[0,1,'no']]
     labels=['no surfacing','flippers']
     return dataSet,labels
-
+#划分数据集根据axis的值所指的对象来进行划分数据集，比如axis=0，就按照第一个特征来划分，featVec[:axis]就是空,
+# 下面经过一个extend函数，将featVec[axis+1:]后面的数存到reduceFeatVec中，然后通过append函数以列表的形式存到retDataSet中
 def splitDataSet(dataSet,axis,value):
     retDataSet=[]
     for featVec in dataSet:
@@ -30,7 +32,7 @@ def splitDataSet(dataSet,axis,value):
             reducedFeatVec.extend(featVec[axis+1:])#把抽取出该特征以后的所有特征组成一个列表
             retDataSet.append(reducedFeatVec) #创建抽取该特征以后的dataset
     return retDataSet
-# 选择最好的数据集划分方式
+# 选择最好的数据集划分方式，以哪个特征值划分最好，实际上就是计算熵最大的特征值
 def chooseBestFeatureToSplit(dataSet):
     numFeatures=len(dataSet[0])-1
     baseEntropy=calcShannonEnt(dataSet)
@@ -47,12 +49,13 @@ def chooseBestFeatureToSplit(dataSet):
             subDataSet=splitDataSet(dataSet,i,value)
             prob=len(subDataSet)/float(len(dataSet))
             newEntropy+=prob*calcShannonEnt(subDataSet)
+        #信息增益
         infoGain=baseEntropy-newEntropy
         if(infoGain>bestInfoGain):
             bestInfoGain=infoGain
             bestFeature=i #返回最好的属性特征对应的地址
     return bestFeature
-
+#返回出现次数最多的分类名称
 def majorityCnt(classList):
     classCount={}
     for vote in classList:
