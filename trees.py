@@ -11,6 +11,7 @@ def calcShannonEnt(dataSet):
             labelCounts[currentLabel]=0
         labelCounts[currentLabel]+=1
     #计算数据集的熵
+    # print(labelCounts)
     shannonEnt=0.0
     for key in labelCounts:
         prob=float(labelCounts[key])/numEntries
@@ -35,18 +36,19 @@ def splitDataSet(dataSet,axis,value):
 # 选择最好的数据集划分方式，以哪个特征值划分最好，实际上就是计算熵最大的特征值
 def chooseBestFeatureToSplit(dataSet):
     numFeatures=len(dataSet[0])-1
-    baseEntropy=calcShannonEnt(dataSet)
+    baseEntropy=calcShannonEnt(dataSet)#基准的熵，按照第三个属性计算的，可按其他属性计算，但是下面的循环要把这种属性去掉
     bestInfoGain=0.0;bestFeature = -1
     for i in range(numFeatures):
         #将dataSet中的数据先按行依次放入example中，然后取得example中的example[i]元素放入featList中
         featList=[example[i] for example in dataSet]
-        print(featList)
+        # print(featList)
         uniqueVals=set(featList)# python的set是一个无序不重复元素集
-        print(uniqueVals)
+        # print(uniqueVals)
         newEntropy=0.0
         # 计算每一个属性值的熵,并求和
         for value in uniqueVals:
             subDataSet=splitDataSet(dataSet,i,value)
+            # print(len(subDataSet))
             prob=len(subDataSet)/float(len(dataSet))
             newEntropy+=prob*calcShannonEnt(subDataSet)
         #信息增益
@@ -87,3 +89,15 @@ def createTree(dataSet,labels):
         myTree[bestFeatLabel][value]=createTree(splitDataSet(dataSet,bestFeat,value),subLabels)
         print(myTree)
     return myTree
+#测试决策树函数
+def classify(inputTree,featLabels,testVec):
+    firstStr=list(inputTree.keys())[0] #由于python3改变了dict.keys,返回的是dict_keys对象,支持iterable 但不支持indexable，我们可以将其明确的转化成list：
+    secondDict=inputTree[firstStr]
+    featIndex=featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex]==key:
+            if(type(secondDict[key])).__name__=='dict':
+                classLabel=classify(secondDict[key],featLabels,testVec)
+            else:
+                classLabel=secondDict[key]
+    return classLabel

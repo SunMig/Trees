@@ -3,16 +3,18 @@ from treePlotter import *
 # 测试
 myDat,labels=createDataSet()
 shannon=calcShannonEnt(myDat)
-print("shannon is " +str(shannon))
-myDat,labels=createDataSet()
+# print("shannon is " +str(shannon))
 a=chooseBestFeatureToSplit(myDat)
-print(labels)
-print("The best Feature is "+str(a))
+# print(labels)
+# print("The best Feature is "+str(a))
 
 # 测试树
-# myTree=createTree(myDat,labels)
+myTree=createTree(myDat,labels)
+print(myTree)
+# myTree=retrieveTree(0)
 # print(myTree)
-
+# testlabel=classify(myTree,labels,[1,0])
+# print(testlabel)
 #绘制树
 # myTree=retrieveTree(0)
 # createPlot(myTree)
